@@ -3,8 +3,8 @@ Static JavaScript library for loading offsite iframes in a non-blocking fashion
 
 # USAGE
 iFrame-Embed will load iframes that automatically refreshed every user defined interval and fit in window sizes.
-All iframe behaviors are controlled by viewport locations and active tab.
-If the iframe is outside of the user's viewport or not in active tab, all behaviors are paused and wait till it is back in the viewport.
+All iframe behaviours are controlled by viewport locations and active tab.
+If the iframe is outside of the user's viewport or not in active tab, all behaviours are paused and wait till it is back in the viewport.
 
 To use iFrame-Embed 
 
@@ -41,11 +41,11 @@ The id of the iframe must be unique if multiple iframes need to be loaded in the
 # Parameters
 data-loc: Location of the iframe source.
 data-res: Set 'true' if the iframe need to be responsive. 
-data-ref: Set 'ture' if the iframe need to be refreshed with user defined interval.
+data-ref: Set 'true' if the iframe need to be refreshed with user defined interval.
 
 # Auto Refreshing
 If data-ref is set to 'true', the iframe will be reloaded with the interval set in the embed.js
-The interval can be set defferently for mobile and desktop user.
+The interval can be set differently for mobile and desktop user.
 ``` js
 ao.refreshTimer = {
     mobile: 6000, // every 6 seconds as default
