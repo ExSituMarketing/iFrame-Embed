@@ -9,7 +9,7 @@ If the iframe is outside of the user's viewport or not in active tab, all behavi
 
 To use iFrame-Embed, 
 
-1. simply include embed.js in the html file.
+## Simply include embed.js in the html file.
 
 
 Standard script src at end of document using local path or remote host url:
@@ -36,7 +36,7 @@ Async embed in head section using remote host url:
 </script>
 ```
 
-2. Add iframe in the html file.
+## Add iframe in the html file.
 ``` html
 <iframe data-loc="www.domain.com/iframe.html" data-res="true" data-ref="true" width="1144" height="250" id="async466" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
 ```
@@ -73,7 +73,7 @@ If data-res is set to 'true', the iframe that will fit in the window width will 
 Available sizes:
 300x250, 600x250, 728x90, 962x102, 1144x250
 
-** if the iframe doesn't support the selected window size, the default size iframe will be loaded.
+**if the iframe doesn't support the selected window size, the default size iframe will be loaded.**
 
 
 # Data Logging
