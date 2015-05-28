@@ -76,7 +76,7 @@ Available sizes:
 ** if the iframe doesn't support the selected window size, the default size iframe will be loaded.
 
 
-# Data Logging.
+# Data Logging
 All data logging such as impression and click logging, are trigged by viewport and active window.
 embed.js will send logging info, only the iframe is visible to the user.
 
@@ -85,7 +85,7 @@ embed.js will send logging info, only the iframe is visible to the user.
 The script is developed to serve iframes that promote Ex-Situ websites. 
 Data logging and responsive iframe load functions do not support non Ex-Situ websites.
 
-Including embed.js in the head section can cause blocking the html page loading until the scropt loading is completed.
+Including embed.js in the head section can cause blocking the html page loading until the script loading is completed.
 
 
 # EXAMPLE
