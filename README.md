@@ -7,18 +7,18 @@ iFrame-Embed will load iframes that automatically refreshed every user defined i
 All iframe behaviours are controlled by viewport locations and active tab.
 If the iframe is outside of the user's viewport or not in active tab, all behaviours are paused and wait till it is back in the viewport.
 
-To use iFrame-Embed, 
+To use iFrame-Embed:
 
-## Simply include embed.js in the html file.
+###### Include embed.min.js in the html file.
 
 
 Standard script src at end of document using local path or remote host url:
 
 ``` html
-<script type="text/javascript" src="/path/to/embed.js"></script>
+<script type="text/javascript" src="/path/to/embed.min.js"></script>
 ```
 or
-<script type="text/javascript" src="http://www.domian.com/embed/src/embed.js"></script>
+<script type="text/javascript" src="http://www.domian.com/embed/src/embed.min.js"></script>
 
 
 Async embed in head section using remote host url:
@@ -29,16 +29,16 @@ Async embed in head section using remote host url:
         rpil.async = true;
         rpil.type = "text/javascript";
         var useSSL = "https:" == document.location.protocol;
-        rpil.src = (useSSL ? "https:" : "http:") + "//www.domain.com/embed/src/embed.js"; 
+        rpil.src = (useSSL ? "https:" : "http:") + "//www.domain.com/embed/src/embed.min.js"; 
         var node = document.getElementsByTagName("script")[0];
         node.parentNode.insertBefore(rpil, node);
     })();
 </script>
 ```
 
-## Add iframe in the html file.
+###### Add iframe in the html file.
 ``` html
-<iframe data-loc="www.domain.com/iframe.html" data-res="true" data-ref="true" width="1144" height="250" id="async466" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
+<iframe data-loc="www.domain.com/iframe.html" data-res="true" data-ref="true" width="1144" height="250" id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
 ```
 The id of the iframe must be unique if multiple iframes need to be loaded in the same page.
 
@@ -53,7 +53,7 @@ data-ref: Set 'true' if the iframe need to be refreshed with user defined interv
 
 
 # Auto Refreshing
-If data-ref is set to 'true', the iframe will be reloaded with the interval set in the embed.js
+If data-ref is set to 'true', the iframe will be reloaded with the interval set in the embed.min.js
 The interval can be set differently for mobile and desktop user.
 ``` js
 ao.refreshTimer = {
@@ -63,7 +63,7 @@ ao.refreshTimer = {
 ```
 Mobile agent is defined by viewport width and can be changed in setting
 ``` js
-    mobileWidth: 600, // The width that defines mobile vs desktop views
+mobileWidth: 600, // The width that defines mobile vs desktop views
 ```
 
 
@@ -78,14 +78,14 @@ Available sizes:
 
 # Data Logging
 All data logging such as impression and click logging, are trigged by viewport and active window.
-embed.js will send logging info, only the iframe is visible to the user.
+embed.min.js will send logging info, only the iframe is visible to the user.
 
 
 # NOTE
 The script is developed to serve iframes that promote Ex-Situ websites. 
 Data logging and responsive iframe load functions do not support non Ex-Situ websites.
 
-Including embed.js in the head section can cause blocking the html page loading until the script loading is completed.
+Including embed.min.js in the head section can cause blocking the html page loading until the script loading is completed.
 
 
 # EXAMPLE
@@ -100,9 +100,9 @@ Including embed.js in the head section can cause blocking the html page loading 
     <body>
         <h1>Testing iframe embed with auto refresh and responsive template</h1>
         <br />
-                <iframe data-loc="www.domain.com/iframes.html" data-res="true" data-ref="true" width="1144" height="250" id="async466" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
+                <iframe data-loc="www.domain.com/iframes.html" data-res="true" data-ref="true" width="1144" height="250" id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
         <br />
-	<script type="text/javascript" src="/path/to/embed.js"></script>
+	<script type="text/javascript" src="/path/to/embed.min.js"></script>
     </body>
 </html>
 ```
@@ -119,7 +119,7 @@ or
         	rpil.async = true;
         	rpil.type = "text/javascript";
         	var useSSL = "https:" == document.location.protocol;
-        	rpil.src = (useSSL ? "https:" : "http:") + "//www.domain.com/embed/src/embed.js";
+        	rpil.src = (useSSL ? "https:" : "http:") + "//www.domain.com/embed/src/embed.min.js";
         	var node = document.getElementsByTagName("script")[0];
         	node.parentNode.insertBefore(rpil, node);
     	})();

@@ -10,7 +10,7 @@
                 rpil.async = true;
                 rpil.type = "text/javascript";
                 var useSSL = "https:" == document.location.protocol;
-                rpil.src = (useSSL ? "https:" : "http:") + "//www.domain.com/embed/src/embed.js"; // replace the domain.com with remote host url where embed.js is located.
+                rpil.src = (useSSL ? "https:" : "http:") + "//www.domain.com/embed/src/embed.min.js"; // replace the domain.com with remote host url where embed.js is located.
                 var node = document.getElementsByTagName("script")[0];
                 node.parentNode.insertBefore(rpil, node);
             })();
