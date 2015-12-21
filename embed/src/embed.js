@@ -56,7 +56,11 @@ window.document.getElementsByClassName = function (cl) {
                     mobile: 6000,
                     desktop: 12000
                 };
+                
     },
+            ao.totalViewportTimer = 0;
+            ao.inViewportTimer = 0;
+    
             // Setter to mock the doc
             ao.setDocument = function (doc) {
                 ao.document = doc;
@@ -191,18 +195,18 @@ window.document.getElementsByClassName = function (cl) {
                 }
                 return a;
             },
-    // Get all the url append
-    ao.getUrlAppend = function (e) {
-        var append = [];
-        // Responsive params
-        ao.appendFramewidth(append, e);
-        // Impression flag
-        ao.appendAsyncImpressionLogging(append);
-        // get the page url
-        ao.getCurrentUrl(append);
+            // Get all the url append
+            ao.getUrlAppend = function (e) {
+                var append = [];
+                // Responsive params
+                ao.appendFramewidth(append, e);
+                // Impression flag
+                ao.appendAsyncImpressionLogging(append);
+                // get the page url
+                ao.getCurrentUrl(append);
 
-        return ao.niceQueryString(append);
-    },
+                return ao.niceQueryString(append);
+            },
             // Build a nice query string
             ao.niceQueryString = function (args) {
                 if (args.length > 0) {
@@ -306,6 +310,7 @@ window.document.getElementsByClassName = function (cl) {
             // load iframe
             ao.loadFrame = function (e) {
                 try {
+                    ao.inViewportTimer = 0;
                     ao.setIframeParams(e);
                     e.src = ao.getLocation(e);
                     e.width = ao.fwidth[e.id];
@@ -347,6 +352,10 @@ window.document.getElementsByClassName = function (cl) {
             ao.setIsInActiveWindow = function () {
                 ao.params.isActiveWindow = false;
             },
+            ao.MoveAway = function () {
+                var target = ao.getDatasetDomainFromLocation(ao.current);
+                ao.current.contentWindow.postMessage('total|' + ao.totalViewportTimer, 'http://' + target);
+            },
             // excute resposicive frame load
             ao.executeResponsive = function () {
                 // Only fire if there are responsive elements
@@ -383,6 +392,9 @@ window.document.getElementsByClassName = function (cl) {
 
                 //active tab
                 ao.attachActiveWindowListeners();
+                
+                // move away
+                ao.attachMoveAwayListeners();
             },
             // Process a scroll (viewport detection)
             ao.attacheRefreshListeners = function () {
@@ -396,6 +408,11 @@ window.document.getElementsByClassName = function (cl) {
             ao.attachActiveWindowListeners = function () {
                 window.onfocus = ao.setIsActiveWindow;
                 window.onblur = ao.setIsInActiveWindow;
+            },
+            ao.attachMoveAwayListeners = function () {
+                if(ao.totalViewportTimer != "undefined" &&  ao.totalViewportTimer < 900) {
+                    window.onbeforeunload = ao.MoveAway;               
+                }
             },
             // Process the resize (responsive)
             ao.attacheResponsiveListeners = function () {
@@ -412,8 +429,14 @@ window.document.getElementsByClassName = function (cl) {
             // send message to ao only when it is in the viewport
             ao.sendLog = function () {
                 var target = ao.getDatasetDomainFromLocation(ao.current);
-                if ((ao.inViewport(ao.current.id)) !== false && (target !== false) && (ao.params.isActiveWindow === true)) {
-                    ao.current.contentWindow.postMessage('inviewport', 'http://' + target);
+                if ((ao.inViewport(ao.current.id)) !== false && (target !== false) && (ao.params.isActiveWindow === true)) {                  
+                    ao.totalViewportTimer++;
+                    ao.inViewportTimer++;
+                    console.log("total: " + ao.totalViewportTimer);
+                    console.log("current: " + ao.inViewportTimer);                    
+                    ao.current.contentWindow.postMessage('in|' + ao.inViewportTimer, 'http://' + target);
+                } else {
+                    ao.inViewportTimer = 0;
                 }
             },
             // set post message
@@ -502,3 +525,5 @@ if (!Function.prototype.bind) {
     return fBound;
   };
 }
+
+
