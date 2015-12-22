@@ -431,9 +431,7 @@ window.document.getElementsByClassName = function (cl) {
                 var target = ao.getDatasetDomainFromLocation(ao.current);
                 if ((ao.inViewport(ao.current.id)) !== false && (target !== false) && (ao.params.isActiveWindow === true)) {                  
                     ao.totalViewportTimer++;
-                    ao.inViewportTimer++;
-                    console.log("total: " + ao.totalViewportTimer);
-                    console.log("current: " + ao.inViewportTimer);                    
+                    ao.inViewportTimer++;                  
                     ao.current.contentWindow.postMessage('in|' + ao.inViewportTimer, 'http://' + target);
                 } else {
                     ao.inViewportTimer = 0;
