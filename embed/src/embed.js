@@ -23,7 +23,6 @@ window.document.getElementsByClassName = function (cl) {
         ao.document = window.document;
         // Set the parameters
         ao.params = {
-            appDom: 'www.rabbitporno.com', // Domain to use for the app
             hasResponsive: false, // Window has a responsive iframe
             hasRefresh: false, // Window has a refresh iframe
             asyncImpressionLog: true, // Should we use async impression logging
