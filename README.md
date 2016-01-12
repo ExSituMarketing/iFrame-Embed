@@ -100,7 +100,7 @@ Including embed.min.js in the head section can cause blocking the html page load
     <body>
         <h1>Testing iframe embed with auto refresh and responsive template</h1>
         <br />
-                <iframe data-loc="www.domain.com/iframes.html" data-res="true" data-ref="true" width="1144" height="250" id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
+                <iframe data-loc="www.domain.com/iframes.html" data-res="true" data-ref="true" width=IFRAME_WIDTH height=IFRAME_HEIGHT id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
         <br />
 	<script type="text/javascript" src="/path/to/embed.min.js"></script>
     </body>
@@ -128,7 +128,7 @@ or
     <body>
         <h1>Testing iframe embed with auto refresh and responsive template</h1>
         <br />
-                <iframe data-loc="www.domain.com/iframes.html" data-res="true" data-ref="true" width="1144" height="250" id="async466" src="about:bla$
+                <iframe data-loc="www.domain.com/iframes.html" data-res="true" data-ref="true" width=IFRAME_WIDTH height=IFRAME_HEIGHT id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
         <br />
     </body>
 </html>
