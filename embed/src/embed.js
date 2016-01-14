@@ -18,7 +18,6 @@ window.document.getElementsByClassName = function (cl) {
 // Build the object
 (function (window, ao) {
     ao.init = function (window, ao) {
-
         // Set the document
         ao.document = window.document;
         // Set the parameters
@@ -28,38 +27,34 @@ window.document.getElementsByClassName = function (cl) {
             asyncImpressionLog: true, // Should we use async impression logging
             mobileWidth: 600, // The width that defines mobile vs desktop views
             isActiveWindow: true // Whether this window tab is active or not. 
-        },
+        };
         // The AO elements on the page -> obtained via getElementsByClassName
-        ao.elements = {},
-                // The current element (needed for the setInterval callback)
-                ao.current = null,
-                // The frame widths
-                ao.fwidth = {},
-                // The frame heights
-                ao.fheight = {},
-                // Heights that correspond with widths
-                ao.responsiveSteps = {
-                    300: "250",
-                    728: "90",
-                    962: "102",
-                    1144: "250",
-                    600: "250"
-                },
+        ao.elements = [];
+        // The frame widths
+        ao.fwidth = [];
+        // The frame heights
+        ao.fheight = [];
+        // Heights that correspond with widths
+        ao.responsiveSteps = {
+            300: "250",
+            728: "90",
+            962: "102",
+            1144: "250",
+            600: "250"
+        };
         // The frame messagers
-        ao.messageID = {},
-                // The frame timers
-                ao.timerID = {},
-                        ao.inTimerID = {},
-                // Timings for the refresh rate
-                ao.refreshTimer = {
-                    mobile: 6000,
-                    desktop: 12000
-                };
-                
+        ao.messageID = [];
+        // The frame timers
+        ao.timerID = [];
+        // Timings for the refresh rate
+        ao.refreshTimer = {
+            mobile: 6000,
+            desktop: 12000
+        };
+        
+        ao.totalViewportTimer = [];
+        ao.inViewportTimer = [];                
     },
-            ao.totalViewportTimer = 0;
-            ao.inViewportTimer = 0;
-    
             // Setter to mock the doc
             ao.setDocument = function (doc) {
                 ao.document = doc;
@@ -87,19 +82,19 @@ window.document.getElementsByClassName = function (cl) {
                 }
                 // Set the timer id's
                 ao.defaultTimerID(e);
-                if ((ao.isAutoRefresh(e) === 'true') && (ao.inViewport(e.id) !== false) && (ao.params.isActiveWindow === true)) {
+                if ((ao.isAutoRefresh(e) === true) && (ao.inViewport(e.id) !== false) && (ao.params.isActiveWindow === true)) {
                     ao.startTimer(e);
                 }
                 return true;
             },
             // Run in the timer
-            ao.inTimer = function () {              
+            ao.inTimer = function (e) {              
                 try {        
-                    if ((ao.isAutoRefresh(this) === 'true') && (ao.inViewport(this.id) !== false) && (ao.params.isActiveWindow === true)) {
-                        ao.loadFrame(this);
+                    if ((ao.isAutoRefresh(e) === true) && (ao.inViewport(e.id) !== false) && (ao.params.isActiveWindow === true)) {
+                        ao.loadFrame(e);
                         return true;
                     } else {
-                        ao.stopTimer(this);
+                        ao.stopTimer(e);
                         return false;
                     }
                 } catch (ex) {
@@ -109,10 +104,9 @@ window.document.getElementsByClassName = function (cl) {
             // Start the timer
             ao.startTimer = function (e) {
                 try {
-                    //ao.current = e;
                     if ((typeof ao.timerID[e.id] === 'undefined') || (ao.timerID[e.id] === 0))
                     {
-                        ao.timerID[e.id] = setInterval( ao.inTimer.bind(e), ao.refreshTimer[ao.getClient()]);
+                        ao.timerID[e.id] = setInterval( function() { ao.inTimer(e) }, ao.refreshTimer[ao.getClient()]);
                     }
                     return true;
                 } catch (ex) {
@@ -174,7 +168,7 @@ window.document.getElementsByClassName = function (cl) {
             },
             // Append the framewidth
             ao.appendFramewidth = function (a, e) {
-                if (ao.isResponsive(e) === 'true') {
+                if (ao.isResponsive(e) === true) {
                     a.push('frameWidth=' + ao.fwidth[e.id]);
                 }
                 return a;
@@ -242,7 +236,7 @@ window.document.getElementsByClassName = function (cl) {
                 // Check for refresh
                 ao.isAutoRefresh(e);
 
-                if (ao.isResponsive(e) === 'true') {
+                if (ao.isResponsive(e) === true) {
                     ao.fwidth[e.id] = ao.getReponsiveFrameWidth(ao.getParentWidth(e));
                     ao.fheight[e.id] = ao.responsiveSteps[ao.fwidth[e.id]];
                 } else {
@@ -290,16 +284,18 @@ window.document.getElementsByClassName = function (cl) {
                 var refresh = ao.getDatasetBoolean(e, 'data-ref');
                 if (refresh === 'true') {
                     ao.params.hasRefresh = true;
+                    return true;
                 }
-                return refresh;
+                return false;
             },
             // Should this iframe be responsive
             ao.isResponsive = function (e) {
                 var responsive = ao.getDatasetBoolean(e, 'data-res');
                 if (responsive === 'true') {
                     ao.params.hasResponsive = true;
+                    return true;
                 }
-                return responsive;
+                return false;
             },
             // Build the location of the iframe from the html dataset tag - we should probably have a fallback here
             ao.getLocation = function (r) {
@@ -309,7 +305,7 @@ window.document.getElementsByClassName = function (cl) {
             // load iframe
             ao.loadFrame = function (e) {
                 try {
-                    ao.inViewportTimer = 0;
+                    ao.inViewportTimer[e.id] = 0;
                     ao.setIframeParams(e);
                     e.src = ao.getLocation(e);
                     e.width = ao.fwidth[e.id];
@@ -339,7 +335,7 @@ window.document.getElementsByClassName = function (cl) {
             },
             ao.loadResponsiveFrames = function (e) {
                 // Only responsive iframes that are in a step
-                if (ao.isResponsive(e) === 'true' && ao.getReponsiveFrameWidth(ao.getParentWidth(e)) !== ao.getFrameWidth(e)) {
+                if (ao.isResponsive(e) === true && ao.getReponsiveFrameWidth(ao.getParentWidth(e)) !== ao.getFrameWidth(e)) {
                     ao.loadFrame(e);
                 }
             },
@@ -352,9 +348,20 @@ window.document.getElementsByClassName = function (cl) {
                 ao.params.isActiveWindow = false;
             },
             ao.MoveAway = function () {
-                var target = ao.getDatasetDomainFromLocation(ao.current);
-                ao.current.contentWindow.postMessage('total|' + ao.totalViewportTimer, 'http://' + target);
+                for (var i = 0; i < ao.elements.length; i++) {
+                    if(typeof ao.elements[i] !== 'undefined') {
+                        ao.MoveAwayLogging(ao.elements[i]);
+                    }
+                }
             },
+            
+            ao.MoveAwayLogging = function (e) {                
+                if (typeof ao.totalViewportTimer[e.id] !== 'undefined' && ao.totalViewportTimer[e.id] < 900) {
+                    var target = ao.getDatasetDomainFromLocation(e);
+                    e.contentWindow.postMessage('total|' + ao.totalViewportTimer[e.id], 'http://' + target);
+                }
+            }
+            
             // excute resposicive frame load
             ao.executeResponsive = function () {
                 // Only fire if there are responsive elements
@@ -381,6 +388,14 @@ window.document.getElementsByClassName = function (cl) {
                     }
                 }
             },
+            ao.setTotalInViewportTimer = function () {
+                for (var i = 0; i < ao.elements.length; i++) {
+                    if (typeof ao.elements[i] !== 'undefined') {
+                        ao.totalViewportTimer[ao.elements[i].id] = 0;
+                        ao.inViewportTimer[ao.elements[i].id] = 0;
+                    }
+                }                
+            }
             // Add the different listners 
             ao.attachListeners = function () {
                 // Refresh
@@ -409,31 +424,31 @@ window.document.getElementsByClassName = function (cl) {
                 window.onblur = ao.setIsInActiveWindow;
             },
             ao.attachMoveAwayListeners = function () {
-                if(ao.totalViewportTimer != "undefined" &&  ao.totalViewportTimer < 900) {
-                    window.onbeforeunload = ao.MoveAway;               
-                }
+                window.onbeforeunload = ao.MoveAway;               
             },
             // Process the resize (responsive)
             ao.attacheResponsiveListeners = function () {
                 window.onresize = ao.executeResponsive;
             },
             // The async Impression logger
-            ao.asyncImpressionLogger = function () {
+            ao.asyncImpressionLogger = function (e) {
                 try {
-                    ao.sendLog();
+                    ao.sendLog(e);
                 } catch (ex) {
                     return false;
                 }
             },
             // send message to ao only when it is in the viewport
-            ao.sendLog = function () {
-                var target = ao.getDatasetDomainFromLocation(ao.current);
-                if ((ao.inViewport(ao.current.id)) !== false && (target !== false) && (ao.params.isActiveWindow === true)) {                  
-                    ao.totalViewportTimer++;
-                    ao.inViewportTimer++;                  
-                    ao.current.contentWindow.postMessage('in|' + ao.inViewportTimer, 'http://' + target);
+            ao.sendLog = function (e) {;
+                var target = ao.getDatasetDomainFromLocation(e);
+                if ((ao.inViewport(e.id)) !== false && (target !== false) && (ao.params.isActiveWindow === true)) {                  
+                    ao.totalViewportTimer[e.id]++;
+                    ao.inViewportTimer[e.id]++;                  
+                    e.contentWindow.postMessage('in|' + ao.inViewportTimer[e.id], 'http://' + target);
+//console.log(e.id + " in: " + ao.inViewportTimer[e.id]);
+//console.log(e.id + " total: " + ao.totalViewportTimer[e.id]);
                 } else {
-                    ao.inViewportTimer = 0;
+                    ao.inViewportTimer[e.id] = 0;
                 }
             },
             // set post message
@@ -454,10 +469,9 @@ window.document.getElementsByClassName = function (cl) {
             },
             // set interval for post message 
             ao.startMessage = function (e) {
-                ao.current = e;
                 if ((typeof ao.messageID[e.id] === 'undefined') || (ao.messageID[e.id] === 0))
                 {
-                    ao.messageID[e.id] = setInterval(ao.asyncImpressionLogger, 1000);
+                    ao.messageID[e.id] = setInterval( function() { ao.asyncImpressionLogger(e) }, 1000);
                 }
             },
             ao.run = function () {
@@ -465,6 +479,8 @@ window.document.getElementsByClassName = function (cl) {
                 ao.document = window.document;
                 // Get all the elements
                 ao.elements = ao.document.getElementsByClassName("aoembed");
+                // initiate total in viewport timer for each e.
+                ao.setTotalInViewportTimer();
                 // Attach Listeners
                 ao.attachListeners();
                 // Execute onload
@@ -500,27 +516,8 @@ window.document.getElementsByClassName = function (cl) {
 
     exports.domReady = domReady;
 })(window, document);
+
 domReady(function () {
     AOembed.run();
 });
-
-// This is bind method support for ie8 and lower
-if (!Function.prototype.bind) {
-  Function.prototype.bind = function(oThis) {
-    if (typeof this !== 'function') {
-        return false;
-    }
-    var aArgs   = Array.prototype.slice.call(arguments, 1),
-        fToBind = this,
-        fNOP    = function() {},
-        fBound  = function() {
-          return fToBind.apply(this instanceof fNOP && oThis ? this : oThis, aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-    return fBound;
-  };
-}
-
 
