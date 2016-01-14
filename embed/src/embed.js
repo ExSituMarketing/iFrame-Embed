@@ -89,15 +89,11 @@ window.document.getElementsByClassName = function (cl) {
             },
             // Run in the timer
             ao.inTimer = function (e) {              
-                try {        
-                    if ((ao.isAutoRefresh(e) === true) && (ao.inViewport(e.id) !== false) && (ao.params.isActiveWindow === true)) {
-                        ao.loadFrame(e);
-                        return true;
-                    } else {
-                        ao.stopTimer(e);
-                        return false;
-                    }
-                } catch (ex) {
+                if ((ao.isAutoRefresh(e) === true) && (ao.inViewport(e.id) !== false) && (ao.params.isActiveWindow === true)) {
+                    ao.loadFrame(e);
+                    return true;
+                } else {
+                    ao.stopTimer(e);
                     return false;
                 }
             },

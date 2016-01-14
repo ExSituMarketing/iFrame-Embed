@@ -23,12 +23,13 @@ QUnit.test('TestDefinitions', function () {
     deepEqual(AOembed.params.asyncImpressionLog, true, "Async impression logging by default");
     deepEqual(AOembed.params.mobileWidth > 0, true, 'Min mobile width set');
     deepEqual(AOembed.params.isActiveWindow, true, 'Default isActiveWindow is set to true');
-    deepEqual(AOembed.elements, {}, 'Elements are empty');
-    deepEqual(AOembed.current, null, 'Current is not set');
-    deepEqual(AOembed.fwidth, {}, 'Widths are empty');
-    deepEqual(AOembed.fheight, {}, 'Heights are empty');
-    deepEqual(AOembed.messageID, {}, 'Message timer ID is empty');
-    deepEqual(AOembed.timerID, {}, 'Refresh timer ID is empty');
+    deepEqual(AOembed.elements, [], 'Elements are empty');
+    deepEqual(AOembed.fwidth, [], 'Widths are empty');
+    deepEqual(AOembed.fheight, [], 'Heights are empty');
+    deepEqual(AOembed.messageID, [], 'Message timer ID is empty');
+    deepEqual(AOembed.timerID, [], 'Refresh timer ID is empty');
+    deepEqual(AOembed.inViewportTimer, [], 'In viewport timer is empty');
+    deepEqual(AOembed.totalViewportTimer, [], 'Total viewport timer ID is empty');    
     deepEqual(AOembed.responsiveSteps[300] > -1, true, "Responsive steps are defined");
     deepEqual(AOembed.refreshTimer.mobile > -1, true, "Refresh time for mobile is defined");
     deepEqual(AOembed.refreshTimer.desktop > -1, true, "Refresh time for desktop is defined");
@@ -45,17 +46,6 @@ QUnit.test("TestGetClient", function () {
     deepEqual(AOembed.getClient(), 'mobile', "We can get mobile client");
 });
 
-//QUnit.test("TestInViewport", function () {
-//    deepEqual(AOembed.inViewport(null),true, "Invalid element handled 0");
-//        var f = $("#qunit-fixture");
-//    f.append('<iframe id="TestElement1" class="test"/><span>CAW</span>');
-//        f.show();
-//       
-//AOembed.init(window, AOembed);
-//    deepEqual(AOembed.inViewport(f.id),false, "Element NOT in the viewport");
-//    //deepEqual(AOembed.inViewport(e.id),true, "Element IS in the viewport");
-//});
-
 module('Auto Refresh');
 QUnit.test('TestDefaultTimer', function () {
     var f = $("#qunit-fixture");
@@ -71,32 +61,32 @@ QUnit.test('TestHandleRefresh', function () {
     var e = document.createElement("TestElement");
     e.setAttribute("id", "TestElement2");
     e.setAttribute("data-ref", "true");
+    deepEqual(AOembed.isAutoRefresh(e), true, 'isAutoRefresh is on');
+    deepEqual(AOembed.inViewport(e.id), true, 'inViewPort ok');
+    deepEqual(AOembed.params.isActiveWindow, true, 'params.isActiveWindow is on');
     deepEqual(AOembed.handleRefresh(e), true, 'Refresh has started');
+    throws(AOembed.handleRefresh(e));
+    e.setAttribute("data-ref", false);
     deepEqual(AOembed.timerID[e.id] > 1, true, 'Timer has been set');
     AOembed.timerID = {};
 });
 
 QUnit.test('TestInTimer', function () {
     AOembed.init(window, AOembed);
-    deepEqual(AOembed.inTimer(), false, 'Invalid element handled 3');
+    deepEqual(AOembed.inTimer(), false, 'inTimer is not set');
     var e = document.createElement("TestElement3");
     e.setAttribute("data-ref", "false");
     deepEqual(AOembed.inTimer(e), false, 'Refresh timer hasnt started yet');
-    e.setAttribute("data-ref", "true");
-    AOembed.handleRefresh(e);
-    AOembed.run();
-    deepEqual(AOembed.inTimer(e), true, 'Refresh timer is running');
     var f = $("#qunit-fixture");
     f.append('<iframe id="TestinTimeStop" class="test"/></iframe>');   
     e = window.document.getElementById('TestinTimeStop');
-    AOembed.current = e;
     deepEqual(AOembed.inTimer(e), false, 'Stop timer outside viewport is ok');
 });
 
 QUnit.test('TestStartTimer', function () {
     deepEqual(AOembed.startTimer(null), false, 'Invalid element handled 4');
     var e = document.createElement("TestElement4");
-    e.setAttribute("data-ref", "true");
+    e.setAttribute("data-ref", true);
     deepEqual(AOembed.startTimer(e), true, 'Timer started');
 });
 
@@ -104,7 +94,7 @@ QUnit.test('TestStopTimer', function () {
     AOembed.init(window, AOembed);
     deepEqual(AOembed.stopTimer(null), false, 'Invalid element handled 5');
     var e = document.createElement("TestElement5");
-    e.setAttribute("data-ref", "true");
+    e.setAttribute("data-ref", true);
     deepEqual(AOembed.startTimer(e), true, 'Timer started');
     deepEqual(AOembed.stopTimer(e), true, 'Timer stoped');
 });
@@ -121,7 +111,7 @@ QUnit.test('TestGetFrameWidth', function () {
 
 QUnit.test('TestGetParentWidth', function () {
     var e = document.createElement("TestGetParentWidth");
-    e.setAttribute("data-res", "true");
+    e.setAttribute("data-res", true);
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
     window.document.body.appendChild(e);
     throws(AOembed.setIframeParams(e));
@@ -145,13 +135,12 @@ QUnit.test('TestGetReponsiveFrameWidth', function () {
 QUnit.test('TestLoadResponsiveFrames', function () {
     var e = document.createElement("TestLoadResponsiveFrames");
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
-    e.setAttribute("data-res", "true");
+    e.setAttribute("data-res", true);
     e.setAttribute("id", "TestLoadResponsiveFrames");
     e.width = 350;
     window.document.body.appendChild(e);
     throws(AOembed.setIframeParams(e));
     throws(AOembed.loadResponsiveFrames(e));
-    /////////////////////////////////////////////////     check if ao.loadFrame(e) is excuted;
 });
 
 module('Viewport');
@@ -215,7 +204,7 @@ QUnit.test('TestGetCurrentUrl', function () {
 QUnit.test('TestGetUrlAppend', function () {
     var url = window.location.href;
     var e = document.createElement("TestGetUrlAppend");
-    e.setAttribute("data-res", "true");
+    e.setAttribute("data-res", true);
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
     window.document.body.appendChild(e);
     var parentWidth = AOembed.getParentWidth(e);
@@ -234,9 +223,9 @@ QUnit.test('TestNiceQueryString', function () {
 QUnit.test('TestSetIframeParams', function () {
     var e = document.createElement("TestSetIframeParams");
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
-    e.setAttribute("data-ref", "true");
-    e.setAttribute("data-res", "true");
-    deepEqual(AOembed.isResponsive(e), 'true', 'SetIframeParams is set');
+    e.setAttribute("data-ref", true);
+    e.setAttribute("data-res", true);
+    deepEqual(AOembed.isResponsive(e), true, 'SetIframeParams is set');
 });
 
 // test getFrameHeight
@@ -269,10 +258,10 @@ QUnit.test('TestGetDatasetLocation', function () {
 QUnit.test('TestIsAutoRefresh', function () {
     var e = document.createElement("TestIsAutoRefresh");
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
-    e.setAttribute("data-ref", "true");
+    e.setAttribute("data-ref", true);
     deepEqual(AOembed.params.hasRefresh, false, 'Auto refresh is initiated');
     throws(AOembed.isAutoRefresh(e));
-    deepEqual(AOembed.params.hasRefresh, true, 'Auto refresh is on');
+    deepEqual(AOembed.params.hasRefresh, true, 'Auto refresh is on');    
 });
 
 // test isResponsive
@@ -342,7 +331,8 @@ QUnit.test('TestExecuteResponsive', function () {
 // test executeRefresh
 QUnit.test('TestExecuteRefresh', function () {
     AOembed.init(window, AOembed);
-    throws(AOembed.executeRefresh());
+    AOembed.params.hasRefresh = true;
+    throws(AOembed.executeRefresh(), "execute refresh the iframe is ok");
 });
 
 // test execute
@@ -355,42 +345,43 @@ QUnit.test('TestExecute', function () {
 QUnit.test('TestEach', function () {
     var e = document.createElement("TestEach");
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
+    
     AOembed.init(window, AOembed);
     AOembed.run();
-    throws(AOembed.each('loadFrame'));
+    throws(AOembed.each('loadFrame'), "load frame is successful");    
 });
 
 //test attachListeners
 QUnit.test('TestAttachListeners', function () {
     AOembed.init(window, AOembed);
-    throws(AOembed.attachListeners());
+    throws(AOembed.attachListeners(), "set all listeners ok");
 });
 
 // test attacheRefreshListeners
 QUnit.test('TestAttacheRefreshListeners', function () {
     AOembed.init(window, AOembed);
-    throws(AOembed.attacheRefreshListeners());
-    
+    throws(AOembed.attacheRefreshListeners(), "open attacheRefreshListeners is ok");    
 });
 
 // test TestSttachActiveWindowListeners
 QUnit.test('TestAttachActiveWindowListeners', function () {
     AOembed.init(window, AOembed);
-    throws(AOembed.attachActiveWindowListeners());
+    throws(AOembed.attachActiveWindowListeners(), "open attachActiveWindowListeners is ok");
 });
 
 // test attacheResponsiveListeners
 QUnit.test('TestAttacheResponsiveListeners', function () {
     AOembed.init(window, AOembed);
-    throws(AOembed.attacheResponsiveListeners());
+    throws(AOembed.attacheResponsiveListeners(), "open attacheResponsiveListeners is ok");
 });
 
 // test asyncImpressionLogger
 QUnit.test('TestAsyncImpressionLogger', function () {
+    throws(AOembed.asyncImpressionLogger(), 'AsyncImpressionLogger is not set');
     var f = $("#qunit-fixture");
     f.append('<iframe id="TestElement1" class="test"/>');
     var e = document.getElementById('TestElement1');
-    deepEqual(AOembed.asyncImpressionLogger(e), false, 'AsyncImpressionLogger is set');
+    throws(AOembed.asyncImpressionLogger(e), 'AsyncImpressionLogger is set');
 });
 
 // test postMessageSender
@@ -407,7 +398,7 @@ QUnit.test('TestStopMessage', function () {
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
     e.setAttribute("id", "TestStopMessage");
     AOembed.messageID['TestStopMessage'] = 1;
-    throws(AOembed.stopMessage(e));
+    throws(AOembed.stopMessage(e), "stop posting message is ok");
     deepEqual(AOembed.timerID[e.id], undefined, 'messaging is stop');
 });
 
@@ -416,24 +407,41 @@ QUnit.test('TestStartMessage', function () {
     var e = document.createElement("TestStartMessage");
     e.setAttribute("data-loc", "rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html");
     e.setAttribute("id", "TestStartMessage");
-    throws(AOembed.startMessage(e));
+    throws(AOembed.startMessage(e), "start posting message is ok");
     deepEqual(AOembed.messageID[e.id] > 1, true, 'messaging is started');
 });
 
 // test ao run
 QUnit.test('TestAoRun', function () {
     var f = $("#qunit-fixture");
-    f.append('<iframe id="TestAoRun" class="test"/ data-loc="rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html" data-res="true" data-ref= "false" width="1144" height="250" id="async466" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>');
+    f.append('<iframe id="TestAoRun" data-loc="rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html" data-res="true" data-ref= "false" width="1144" height="250" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none">');
     AOembed.init(window, AOembed);
-    throws(AOembed.run());
+    throws(AOembed.run(), "loading the iframe is ok");
+    
 });
 
 // test sendLog
-QUnit.test('TestSendLog', function () {
+QUnit.test('TestSendLog', function (assert) {
     var f = $("#qunit-fixture");
-    f.append('<iframe id="TestSendLog" class="test"/ data-loc="rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html" data-res="true" data-ref= "false" width="1144" height="250" id="async466" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>');
+    f.append('<iframe id="TestSendLog" data-loc="rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html" data-res="false" data-ref= "true" width="1144" height="250" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>');
     e = window.document.getElementById('TestSendLog');
-    AOembed.current = e;
-    throws(AOembed.sendLog(e));
+    throws(AOembed.sendLog(e));    
+    deepEqual(AOembed.inViewport(e.id), true, 'in viewport ok');
+    deepEqual(AOembed.isAutoRefresh(e), true, 'auto refreshing is on');
+    deepEqual(AOembed.params.isActiveWindow, true, 'active window set true');
+    throws(AOembed.inTimer(e), "intimer is ok");    
+    f = $("#qunit-fixture");
+    f.append('<iframe id="TestViewportOut" class="test"/>');    
+    deepEqual(AOembed.inViewport('TestViewportOut'), false, 'Detecting outside viewport is ok');    
+    e = window.document.getElementById('TestViewportOut');
+    throws(AOembed.sendLog(e), 'send log to the target is ok');    
 });
 
+// test MoveAway
+QUnit.test('TestMoveAway', function () {
+    var f = $("#qunit-fixture");
+    f.append('<iframe id="TestSendLog" data-loc="rabbitporno.bugs.ex-situ.com/friends/4503-cherrypimps/466-cherrypimps.html" data-res="true" data-ref= "false" width="1144" height="250" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>');
+    throws(AOembed.init(window, AOembed), 'initiation is ok');
+    throws(AOembed.run(), 'load ifram is ok');
+    throws(AOembed.MoveAway(), 'send move away signal is ok');
+});
