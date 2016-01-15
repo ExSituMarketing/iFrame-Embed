@@ -7,21 +7,21 @@ iFrame-Embed will load iframes that automatically refreshed every user defined i
 All iframe behaviours are controlled by viewport locations and active tab.
 If the iframe is outside of the user's viewport or not in active tab, all behaviours are paused and wait till it is back in the viewport.
 
-To use iFrame-Embed:
-
-###### Include embed.min.js in the html file.
+**To use iFrame-Embed:**
 
 
-Standard script src at end of document using local path or remote host url:
+1. Include embed.min.js in the html file.
 
+*Standard script src using local path or remote host url:*
 ``` html
 <script type="text/javascript" src="/path/to/embed.min.js"></script>
-```
 or
 <script type="text/javascript" src="http://www.domian.com/embed/src/embed.min.js"></script>
+```
 
+or 
 
-Async embed in head section using remote host url:
+*Async embed in head section using remote host url:*
 ``` html
 <script>
     (function () {
@@ -36,11 +36,12 @@ Async embed in head section using remote host url:
 </script>
 ```
 
-###### Add iframe in the html file.
+2. Add iframe in the html file.
 ``` html
-<iframe data-loc="www.domain.com/iframe.html" data-res="true" data-ref="true" width="1144" height="250" id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
+<iframe data-loc="www.domain.com/iframe.html" data-res="TRUE_OR_FALSE_HERE" data-ref="TRUE_OR_FALSE_HERE" width="FRAME_WIDTH_HERE" height="FRAME_HEIGHT_HERE" id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
 ```
 The id of the iframe must be unique if multiple iframes need to be loaded in the same page.
+The class name must be **aoembed**
 
 
 # Parameters
@@ -50,6 +51,12 @@ data-loc: Location of the iframe source.
 data-res: Set 'true' if the iframe need to be responsive. 
 
 data-ref: Set 'true' if the iframe need to be refreshed with user defined interval.
+
+width: The width of the iframe.
+
+height: the height of the iframe.
+
+class: must be **aoembed**
 
 
 # Auto Refreshing
@@ -79,6 +86,9 @@ Available sizes:
 # Data Logging
 All data logging such as impression and click logging, are trigged by viewport and active window.
 embed.min.js will send logging info, only the iframe is visible to the user.
+
+Along with logging information, the script will send viewport timing information to the iframe.
+It measures total time of the iframe in the browser's viewport before clicks or move away.
 
 
 # NOTE
