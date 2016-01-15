@@ -21,7 +21,7 @@ or
 
 or 
 
-*Async embed in head section using remote host url:*
+⋅⋅⋅Async embed in head section using remote host url:*
 ``` html
 <script>
     (function () {
@@ -36,7 +36,7 @@ or
 </script>
 ```
 
-2. Add iframe in the html file.
+⋅⋅⋅Add iframe in the html file.
 ``` html
 <iframe data-loc="www.domain.com/iframe.html" data-res="TRUE_OR_FALSE_HERE" data-ref="TRUE_OR_FALSE_HERE" width="FRAME_WIDTH_HERE" height="FRAME_HEIGHT_HERE" id="ADD_UNIQUE_ID_HERE" src="about:blank" class="aoembed" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" allowTransparency="true" style="display:none"></iframe>
 ```
