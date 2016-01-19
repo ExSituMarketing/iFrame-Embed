@@ -409,9 +409,9 @@ window.document.getElementsByClassName = function (cl) {
             // Process a scroll (viewport detection)
             ao.attacheRefreshListeners = function () {
                 if (window.addEventListener) {
-                    window.addEventListener("scroll", ao.executeRefresh, false);
+                    window.addEventListener("scroll", ao.setIsActiveWindow, false);
                 } else {
-                    window.attachEvent("onscroll", ao.executeRefresh);
+                    window.attachEvent("onscroll", ao.setIsActiveWindow);
                 }
             },
             // active window listener
