@@ -295,7 +295,7 @@ window.document.getElementsByClassName = function (cl) {
             },
             // Build the location of the iframe from the html dataset tag - we should probably have a fallback here
             ao.getLocation = function (r) {
-                var loc = ao.document.location.protocol + '//' + ao.getDatasetLocation(r) + ao.getUrlAppend(r);
+                var loc = 'https://' + ao.getDatasetLocation(r) + ao.getUrlAppend(r);
                 return loc;
             },
             // load iframe
@@ -354,7 +354,7 @@ window.document.getElementsByClassName = function (cl) {
             ao.MoveAwayLogging = function (e) {                
                 if (typeof ao.totalViewportTimer[e.id] !== 'undefined' && ao.totalViewportTimer[e.id] < 900) {
                     var target = ao.getDatasetDomainFromLocation(e);
-                    e.contentWindow.postMessage('total|' + ao.totalViewportTimer[e.id], 'http://' + target);
+                    e.contentWindow.postMessage('total|' + ao.totalViewportTimer[e.id], 'https://' + target);
                 }
             }
             
@@ -440,9 +440,7 @@ window.document.getElementsByClassName = function (cl) {
                 if ((ao.inViewport(e.id)) !== false && (target !== false) && (ao.params.isActiveWindow === true)) {                  
                     ao.totalViewportTimer[e.id]++;
                     ao.inViewportTimer[e.id]++;                  
-                    e.contentWindow.postMessage('in|' + ao.inViewportTimer[e.id], 'http://' + target);
-//console.log(e.id + " in: " + ao.inViewportTimer[e.id]);
-//console.log(e.id + " total: " + ao.totalViewportTimer[e.id]);
+                    e.contentWindow.postMessage('in|' + ao.inViewportTimer[e.id], 'https://' + target);
                 } else {
                     ao.inViewportTimer[e.id] = 0;
                 }
