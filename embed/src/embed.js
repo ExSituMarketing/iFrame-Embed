@@ -26,7 +26,8 @@ window.document.getElementsByClassName = function (cl) {
             hasRefresh: false, // Window has a refresh iframe
             asyncImpressionLog: true, // Should we use async impression logging
             mobileWidth: 600, // The width that defines mobile vs desktop views
-            isActiveWindow: true // Whether this window tab is active or not. 
+            isActiveWindow: true, // Whether this window tab is active or not. 
+            protocol: 'https' // use https or http protocol
         };
         // The AO elements on the page -> obtained via getElementsByClassName
         ao.elements = [];
@@ -295,7 +296,7 @@ window.document.getElementsByClassName = function (cl) {
             },
             // Build the location of the iframe from the html dataset tag - we should probably have a fallback here
             ao.getLocation = function (r) {
-                var loc = 'https://' + ao.getDatasetLocation(r) + ao.getUrlAppend(r);
+                var loc = ao.params.protocol + '://' + ao.getDatasetLocation(r) + ao.getUrlAppend(r);
                 return loc;
             },
             // load iframe
@@ -354,7 +355,7 @@ window.document.getElementsByClassName = function (cl) {
             ao.MoveAwayLogging = function (e) {                
                 if (typeof ao.totalViewportTimer[e.id] !== 'undefined' && ao.totalViewportTimer[e.id] < 900) {
                     var target = ao.getDatasetDomainFromLocation(e);
-                    e.contentWindow.postMessage('total|' + ao.totalViewportTimer[e.id], 'https://' + target);
+                    e.contentWindow.postMessage('total|' + ao.totalViewportTimer[e.id], ao.params.protocol + '://' + target);
                 }
             }
             
@@ -440,7 +441,7 @@ window.document.getElementsByClassName = function (cl) {
                 if ((ao.inViewport(e.id)) !== false && (target !== false) && (ao.params.isActiveWindow === true)) {                  
                     ao.totalViewportTimer[e.id]++;
                     ao.inViewportTimer[e.id]++;                  
-                    e.contentWindow.postMessage('in|' + ao.inViewportTimer[e.id], 'https://' + target);
+                    e.contentWindow.postMessage('in|' + ao.inViewportTimer[e.id] + '|' + ao.totalViewportTimer[e.id], ao.params.protocol + '://' + target);
                 } else {
                     ao.inViewportTimer[e.id] = 0;
                 }
