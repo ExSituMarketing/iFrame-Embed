@@ -5,6 +5,9 @@
  * Copyright 2015 Ex Situ Marketing
  * Released under the MIT license 
  */
+
+var J50Npi={currentScript:null,getJSON:function(b,d,h){var g=b+(b.indexOf("?")+1?"&":"?");var c=document.getElementsByTagName("head")[0];var a=document.createElement("script");var f=[];var e="";this.success=h;d.callback="J50Npi.success";for(e in d){f.push(e+"="+encodeURIComponent(d[e]))}g+=f.join("&");a.type="text/javascript";a.src=g;if(this.currentScript){c.removeChild(currentScript)}c.appendChild(a)},success:null};
+
 window.document.getElementsByClassName = function (cl) {
     var retnode = [];
     var elem = this.getElementsByTagName('*');
@@ -18,6 +21,7 @@ window.document.getElementsByClassName = function (cl) {
 // Build the object
 (function (window, ao) {
     ao.init = function (window, ao) {
+       
         // Set the document
         ao.document = window.document;
         // Set the parameters
@@ -51,10 +55,11 @@ window.document.getElementsByClassName = function (cl) {
         ao.refreshTimer = {
             mobile: 6000,
             desktop: 12000
-        };
-        
+        };        
         ao.totalViewportTimer = [];
-        ao.inViewportTimer = [];                
+        ao.inViewportTimer = [];       
+        ao.autoRefreshTime = [];
+        
     },
             // Setter to mock the doc
             ao.setDocument = function (doc) {
@@ -84,7 +89,8 @@ window.document.getElementsByClassName = function (cl) {
                 // Set the timer id's
                 ao.defaultTimerID(e);
                 if ((ao.isAutoRefresh(e) === true) && (ao.inViewport(e.id) !== false) && (ao.params.isActiveWindow === true)) {
-                    ao.startTimer(e);
+                    var refreshTime = ao.getCampaignRefreshTime(e.id);
+                    ao.startTimer(e, refreshTime);
                 }
                 return true;
             },
@@ -92,24 +98,42 @@ window.document.getElementsByClassName = function (cl) {
             ao.inTimer = function (e) {              
                 if ((ao.isAutoRefresh(e) === true) && (ao.inViewport(e.id) !== false) && (ao.params.isActiveWindow === true)) {
                     ao.loadFrame(e);
+                    ao.resetInTimer(e);
                     return true;
                 } else {
                     ao.stopTimer(e);
                     return false;
                 }
             },
+            // reset refresh timer with the new interval
+            ao.resetInTimer = function (e) {
+                var clientMethod = ao.getClient();
+                var refreshTime = ao.getCampaignRefreshTime(e.id);
+                if(ao.refreshTimer[clientMethod] != refreshTime) {
+                    ao.stopTimer(e);
+                    ao.startTimer(e, refreshTime);
+                }                
+            },            
             // Start the timer
-            ao.startTimer = function (e) {
-                try {
+            ao.startTimer = function (e, refreshTime) {                
+                try {                    
                     if ((typeof ao.timerID[e.id] === 'undefined') || (ao.timerID[e.id] === 0))
-                    {
-                        ao.timerID[e.id] = setInterval( function() { ao.inTimer(e) }, ao.refreshTimer[ao.getClient()]);
+                    {                        
+                        ao.timerID[e.id] = setInterval( function() { ao.inTimer(e) }, refreshTime);
                     }
                     return true;
                 } catch (ex) {
                     return false;
                 }
             },
+            // compare default refresh time with campaign refresh time 
+            ao.getCampaignRefreshTime = function (id) {
+                var clientMethod = ao.getClient();
+                if(typeof ao.autoRefreshTime[id] == 'object' && ao.autoRefreshTime[id][clientMethod] > 0) {
+                    return ao.autoRefreshTime[id][clientMethod];   
+                }
+                return ao.refreshTimer[clientMethod];
+            }
             // Stop the timer for the iframe refresh
             ao.stopTimer = function (e) {
                 try {
@@ -350,15 +374,13 @@ window.document.getElementsByClassName = function (cl) {
                         ao.MoveAwayLogging(ao.elements[i]);
                     }
                 }
-            },
-            
+            },            
             ao.MoveAwayLogging = function (e) {                
                 if (typeof ao.totalViewportTimer[e.id] !== 'undefined' && ao.totalViewportTimer[e.id] < 900) {
                     var target = ao.getDatasetDomainFromLocation(e);
                     e.contentWindow.postMessage('total|' + ao.totalViewportTimer[e.id], ao.params.protocol + '://' + target);
                 }
-            }
-            
+            },            
             // excute resposicive frame load
             ao.executeResponsive = function () {
                 // Only fire if there are responsive elements
@@ -392,7 +414,7 @@ window.document.getElementsByClassName = function (cl) {
                         ao.inViewportTimer[ao.elements[i].id] = 0;
                     }
                 }                
-            }
+            },
             // Add the different listners 
             ao.attachListeners = function () {
                 // Refresh
@@ -468,12 +490,30 @@ window.document.getElementsByClassName = function (cl) {
                 {
                     ao.messageID[e.id] = setInterval( function() { ao.asyncImpressionLogger(e) }, 1000);
                 }
-            },
+            },          
+            ao.callback = function(response){
+                for (var key in response) {
+                    var id = "async" + key;
+                    ao.autoRefreshTime[id] = response[key]; 
+                }
+            },            
+            // get campaign specific paramenters(autorefresh time only for now)
+            ao.getAoCampaignParameters = function() {
+                var data = {};
+                var url = '';
+                for (var i=0; i < ao.elements.length; i++) { 
+                     url = "//"+ao.getDatasetDomainFromLocation(ao.elements[i])+"/json/"+ao.elements[i].id.replace("async", "");
+                     J50Npi.getJSON(url, data, ao.callback);
+                }
+            },          
+          
             ao.run = function () {
                 // Set the document
                 ao.document = window.document;
                 // Get all the elements
                 ao.elements = ao.document.getElementsByClassName("aoembed");
+                // Get AO parameters from the sever by campaign
+                ao.getAoCampaignParameters();                
                 // initiate total in viewport timer for each e.
                 ao.setTotalInViewportTimer();
                 // Attach Listeners
